@@ -1,0 +1,5 @@
+.idea
+.DS_Store
+terraform/*.auto.tfvars
+terraform/.terraform
+slackbot-event-handler/src/node_modules/*

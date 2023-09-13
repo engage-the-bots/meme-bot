@@ -1,0 +1,61 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Setup TF CLI and wrapper
+        uses: hashicorp/setup-terraform@v2
+        id: tf_setup
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::487053949292:role/GitHubActionsOIDC
+          aws-region: us-west-2
+          role-session-name: engage2023
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+
+      - name: Install dependencies
+        run: npm i --save @slack/bolt
+        working-directory: ./slackbot-event-handler
+
+      - name: Package Slackbot Event Handler
+        run: npm ci --omit=dev
+        working-directory: ./slackbot-event-handler
+
+      - name: terraform init
+        run: terraform init -upgrade
+        id: tf_init
+        working-directory: ./terraform
+
+      - name: terraform apply
+        run: terraform apply -auto-approve -input=false
+        id: tf_apply
+        working-directory: ./terraform
+
+      - name: terraform output
+        run: terraform output -json
+        id: tf_output
+        working-directory: ./terraform
