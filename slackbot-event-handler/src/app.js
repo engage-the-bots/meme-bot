@@ -13,8 +13,8 @@ const app = new App({
 });
 
 let keywordMemeMap = {
-    'this-is-fine': { template: '/fine', resourcePathParms: 2, type: '.png' },
-    'panik-kalm-panik': { template: '/panik-kalm-panik', resourcePathParms: 3, type: '.png' },
+    'this-is-fine': { template: '/fine', resourcePathParms: 2, type: '.png', title: 'This is fine', memeString: '_this-is-fine&top&bottom_', exampleImageUrl: 'https://api.memegen.link/images/fine/top/bottom.png'}, //https://api.memegen.link/images/fine/_/this_is_fine.png
+    // 'panik-kalm-panik': { template: '/panik-kalm-panik', resourcePathParms: 3, type: '.png' },
     // 'patrick', // https://api.memegen.link/images/patrick/why_don't_we_take_all_the_memes/and_put_them_on_memegen.png
     // https://api.memegen.link/images/right/Senior_Developer/Junior_Developer/Put_it_in_the_backlog./So_we_can_fix_it_later,_right~q/So_we_can_fix_it_later,_right~q.png
     // https://api.memegen.link/images/yodawg/yo_dawg/i_heard_you_like_memes.png
@@ -22,7 +22,7 @@ let keywordMemeMap = {
     // https://api.memegen.link/images/doge/such_meme/very_skill.png
     // https://api.memegen.link/images/drake/left_on_unread/left_on_read.png
     // https://api.memegen.link/images/drowning/Me_Asking_for_Help/Online_Commenter/I'm_having_that_problem_too..png
-    // https://api.memegen.link/images/feelsgood/_/feels_good.png
+    'feels-good': { template: '/feelsgood', resourcePathParms: 2, type: '.png', title: 'Feels good', memeString: '_feels-good&top&bottom_', exampleImageUrl: 'https://api.memegen.link/images/feelsgood/top/bottom.png'}, //https://api.memegen.link/images/fine/_/this_is_fine.png
 }
 
 function messageToImageUrl(userMessage) {
@@ -32,28 +32,28 @@ function messageToImageUrl(userMessage) {
         item = item.replace(/ /g, '_');
         return item;
     });
-    console.log('on userMessageParts')
+    console.log('Parsing user message into parts -> meme-template and captions')
     console.log(userMessageParts)
 
     let memeMap = keywordMemeMap[userMessageParts[0]];
-    console.log('on memeMap');
+    console.log('Using meme:');
     console.log(memeMap);
     if(memeMap && userMessageParts.length > 0 && userMessageParts.length <= memeMap.resourcePathParms + 1) {
         let imageUrl = 'https://api.memegen.link/images';
-        console.log('on imageUrl');
+        console.log('On Image URL Base:');
         console.log(imageUrl);
         imageUrl += memeMap.template;
-        console.log('on imageUrl2');
+        console.log('On Image URL Base + template:');
         console.log(imageUrl);
         for(let i = 1; i < userMessageParts.length; i++) {
-            console.log('on imageUrl N');
-            console.log(imageUrl);
             let part = userMessageParts[i];
             imageUrl += `/${part}`;
+            console.log(`On Image URL resource-path parameter[${i}]:`);
+            console.log(imageUrl);
         }
-        console.log('on imageUrl3');
-        console.log(imageUrl);
         imageUrl += memeMap.type;
+        console.log('On Image URL filetype:');
+        console.log(imageUrl);
         return imageUrl;
     } else {
         return null;
@@ -113,17 +113,39 @@ app.message('help', async ({ message, say }) => {
     // say() sends a message to the channel where the event was triggered
     console.log('on message -- help')
     console.log(`with message [${JSON.stringify(message)}]`);
-    await say({
+
+    let helpMessage= {
         blocks: [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "Sure! Here are some example mentions I respond to:\n>@me help\n>@me hello\n>@me goodbye"
+                    "text": "Sure! Here are some mems I can make if you mention me with one of the the meme strings:\n\nExample:\n>@Engage Bot N this-is-fine& &this is fine"
                 }
+            },
+            {
+                "type": "divider"
             }
         ]
-    });
+    }
+    for (const [keyword, meme] of keywordMemeMap.entries()) {
+        let memeSections = {
+            type: "section",
+            text: {
+                "type": "mrkdwn",
+                "text": `*${meme.title}*\nmeme string: @me ${meme.memeString}\n`
+            },
+            "accessory": {
+                "type": "image",
+                "image_url": `${meme.exampleImageUrl}`,
+                "alt_text": "alt text for image"
+            }
+        };
+        helpMessage.blocks.push({
+            memeSections
+        });
+    }
+    await say(helpMessage);
 });
 
 // Boilerplate - Handle the Lambda function event
