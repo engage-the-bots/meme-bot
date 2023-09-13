@@ -39,7 +39,7 @@ app.event('app_mention', async ({ event, say , client}) => {
         console.log('A mention was made with "hello" or "hi" in the message');
         await say(imageBlocksBuilder("https://api.memegen.link/images/fine/services_down/this_is_fine.png"));
     } else {
-        client.chat.postEphemeral({                          // <--- and here
+        await client.chat.postEphemeral({
             token: process.env.SLACK_BOT_TOKEN,
             channel: event.channel,
             user: event.user,
