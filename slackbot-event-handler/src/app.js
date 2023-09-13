@@ -128,7 +128,7 @@ app.message('help', async ({ message, say }) => {
             }
         ]
     }
-    for (const [keyword, meme] of keywordMemeMap.entries()) {
+    for (const [keyword, meme] of Object.entries(keywordMemeMap)) {
         let memeSections = {
             type: "section",
             text: {
