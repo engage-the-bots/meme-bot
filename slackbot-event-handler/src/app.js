@@ -12,32 +12,38 @@ const app = new App({
     receiver: awsLambdaReceiver,
 });
 
-const HELP_MESSAGE = {
-
+function imageBlocksBuilder(imageUrl) {
+    return {
+        blocks: [
+            {
+                "type": "image",
+                "title": {
+                    "type": "plain_text",
+                    "text": "Memes everywhere",
+                    "emoji": true
+                },
+                "image_url": imageUrl,
+                "alt_text": "memes-everywhere"
+            }
+        ],
+    }
 }
 
 /* Mention handler */
-app.event('app_mention', async ({ event, say }) => {
+app.event('app_mention', async ({ event, say , client}) => {
     console.log('on event -- app_mention');
     console.log(`with event [${JSON.stringify(event)}]`);
 
     if(event.text.includes('hello')) {
         // Respond to mentions that say "hello" or "hi"
         console.log('A mention was made with "hello" or "hi" in the message');
-        await say({
-            blocks: [
-                {
-                    "type": "image",
-                    "title": {
-                        "type": "plain_text",
-                        "text": "Memes everywhere",
-                        "emoji": true
-                    },
-                    "image_url": "https://api.memegen.link/images/buzz/memes/memes_everywhere.gif",
-                    "alt_text": "memes-everywhere"
-                }
-            ],
-            text: `Hey there <@${event.user}>!`
+        await say(imageBlocksBuilder("https://api.memegen.link/images/fine/services_down/this_is_fine.png"));
+    } else {
+        client.chat.postEphemeral({                          // <--- and here
+            token: process.env.SLACK_BOT_TOKEN,
+            channel: event.channel,
+            user: event.user,
+            text: "There was a problem fulfilling your request"
         });
     }
 });
