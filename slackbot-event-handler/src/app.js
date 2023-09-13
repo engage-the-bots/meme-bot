@@ -53,7 +53,7 @@ function messageToImageUrl(userMessage) {
         }
         console.log('on imageUrl3');
         console.log(imageUrl);
-        imageUrl += template.filetype;
+        imageUrl += template.type;
         return imageUrl;
     } else {
         return null;
