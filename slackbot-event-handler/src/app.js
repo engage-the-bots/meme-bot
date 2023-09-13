@@ -27,7 +27,7 @@ let keywordMemeMap = {
 
 function messageToImageUrl(userMessage) {
     // Parse message into parts
-    let userMessageParts = userMessage.split('&').map(function(item) {
+    let userMessageParts = userMessage.split('&amp;').map(function(item) {
         item = item.trim();
         item = item.replace(/ /g, '_');
         return item;
@@ -74,7 +74,7 @@ app.event('app_mention', async ({ event, say , client}) => {
 
     // remove mention from message
     let message = event.text.replace(/<@.*>/, '').trim();
-    let imageUrl = messageToImageUrl(event.text);
+    let imageUrl = messageToImageUrl(message);
 
     if(imageUrl) {
         console.log('on imageUrl')
@@ -85,7 +85,7 @@ app.event('app_mention', async ({ event, say , client}) => {
             token: process.env.SLACK_BOT_TOKEN,
             channel: event.channel,
             user: event.user,
-            text: "There was a problem fulfilling your request"
+            text: "There was a problem fulfilling your request. Try direct messaging 'help' to see what I can do."
         });
     }
 });
