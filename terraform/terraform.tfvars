@@ -1,1 +1,1 @@
-slackbot_resource_name = "etb-bot2"
+slackbot_resource_name = "etb-bot2-memebot"
