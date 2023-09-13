@@ -36,13 +36,23 @@ function messageToImageUrl(userMessage) {
     console.log(userMessageParts)
 
     let template = keywordMemeMap[userMessageParts[0]];
-    if(template && userMessageParts.length > 0 && userMessageParts.length <= template.resourcePathParms) {
+    console.log('on template');
+    console.log(template);
+    if(template && userMessageParts.length > 0 && userMessageParts.length <= template.resourcePathParms + 1) {
         let imageUrl = 'https://api.memegen.link/images';
+        console.log('on imageUrl');
+        console.log(imageUrl);
         imageUrl += userMessageParts[0];
+        console.log('on imageUrl2');
+        console.log(imageUrl);
         for(let i = 1; i < userMessageParts.length; i++) {
+            console.log('on imageUrl N');
+            console.log(imageUrl);
             let part = userMessageParts[i];
             imageUrl += `/${part}`;
         }
+        console.log('on imageUrl3');
+        console.log(imageUrl);
         imageUrl += template.filetype;
         return imageUrl;
     } else {
