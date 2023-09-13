@@ -27,39 +27,20 @@ app.event('app_mention', async ({ event, say }) => {
         await say({
             blocks: [
                 {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": `Hey there <@${event.user}>!`
+                    "type": "image",
+                    "title": {
+                        "type": "plain_text",
+                        "text": "Memes everywhere",
+                        "emoji": true
                     },
-                    "accessory": {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Click Me"
-                        },
-                        "action_id": "button_click"
-                    }
+                    "image_url": "https://api.memegen.link/images/buzz/memes/memes_everywhere.gif",
+                    "alt_text": "memes-everywhere"
                 }
             ],
             text: `Hey there <@${event.user}>!`
         });
-    } else if(event.text.includes('goodbye')) {
-        // Respond to mentions that say "goodbye"
-        console.log('A mention was made with "goodbye" in the message');
-        await say(`See ya later, <@${event.user}> :wave:`);
-    } else {
-        // Respond to all other mentions with a default message
-        await say(`Hello <@${event.user}>, feel free to direct-message "help" to me to see what I can do.`);
     }
 });
-
-// Listens for an action from a button click
-app.action('button_click', async ({ body, ack, say }) => {
-    await ack();
-    await say(`<@${body.user.id}> clicked the button`);
-});
-
 
 /* Direct message handlers */
 // A user clicked into your App Home (aka App DM)
