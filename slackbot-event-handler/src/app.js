@@ -12,6 +12,44 @@ const app = new App({
     receiver: awsLambdaReceiver,
 });
 
+let keywordMemeMap = {
+    'this-is-fine': { template: '/fine', resourcePathParms: 2, type: '.png' },
+    'panik-kalm-panik': { template: '/panik-kalm-panik', resourcePathParms: 3, type: '.png' },
+    // 'patrick', // https://api.memegen.link/images/patrick/why_don't_we_take_all_the_memes/and_put_them_on_memegen.png
+    // https://api.memegen.link/images/right/Senior_Developer/Junior_Developer/Put_it_in_the_backlog./So_we_can_fix_it_later,_right~q/So_we_can_fix_it_later,_right~q.png
+    // https://api.memegen.link/images/yodawg/yo_dawg/i_heard_you_like_memes.png
+    // https://api.memegen.link/images/dbg/Clicking_the_'X'_on_a_mobile_ad/The_'X'_is_part_of_the_ad.png
+    // https://api.memegen.link/images/doge/such_meme/very_skill.png
+    // https://api.memegen.link/images/drake/left_on_unread/left_on_read.png
+    // https://api.memegen.link/images/drowning/Me_Asking_for_Help/Online_Commenter/I'm_having_that_problem_too..png
+    // https://api.memegen.link/images/feelsgood/_/feels_good.png
+}
+
+function messageToImageUrl(userMessage) {
+    // Parse message into parts
+    let userMessageParts = userMessage.split('&').map(function(item) {
+        item = item.trim();
+        item = item.replace(/ /g, '_');
+        return item;
+    });
+    console.log('on userMessageParts')
+    console.log(userMessageParts)
+
+    let template = keywordMemeMap[userMessageParts[0]];
+    if(template && userMessageParts.length > 0 && userMessageParts.length <= template.resourcePathParms) {
+        let imageUrl = 'https://api.memegen.link/images';
+        imageUrl += userMessageParts[0];
+        for(let i = 1; i < userMessageParts.length; i++) {
+            let part = userMessageParts[i];
+            imageUrl += `/${part}`;
+        }
+        imageUrl += template.filetype;
+        return imageUrl;
+    } else {
+        return null;
+    }
+}
+
 function imageBlocksBuilder(imageUrl) {
     return {
         blocks: [
@@ -34,10 +72,11 @@ app.event('app_mention', async ({ event, say , client}) => {
     console.log('on event -- app_mention');
     console.log(`with event [${JSON.stringify(event)}]`);
 
-    if(event.text.includes('hello')) {
-        // Respond to mentions that say "hello" or "hi"
-        console.log('A mention was made with "hello" or "hi" in the message');
-        await say(imageBlocksBuilder("https://api.memegen.link/images/fine/services_down/this_is_fine.png"));
+    if(messageToImageUrl(event.text)) {
+        let imageUrl = messageToImageUrl(event.text);
+        console.log('on imageUrl')
+        console.log(imageUrl)
+        await say(imageBlocksBuilder(imageUrl));
     } else {
         await client.chat.postEphemeral({
             token: process.env.SLACK_BOT_TOKEN,
