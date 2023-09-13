@@ -72,8 +72,11 @@ app.event('app_mention', async ({ event, say , client}) => {
     console.log('on event -- app_mention');
     console.log(`with event [${JSON.stringify(event)}]`);
 
-    if(messageToImageUrl(event.text)) {
-        let imageUrl = messageToImageUrl(event.text);
+    // remove mention from message
+    let message = event.text.replace(/<@.*>/, '').trim();
+    let imageUrl = messageToImageUrl(event.text);
+
+    if(imageUrl) {
         console.log('on imageUrl')
         console.log(imageUrl)
         await say(imageBlocksBuilder(imageUrl));
